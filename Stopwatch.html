@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding-top: 20px;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        .time {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .buttons button {
+            margin: 5px;
+            padding: 15px;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            text-align: center;
+        }
+        .start { background: green; color: white; }
+        .stop { background: red; color: white; }
+        .reset { background: gray; color: white; }
+        .record { background: blue; color: white; }
+        .results-container {
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .results h3 {
+            margin-bottom: 10px;
+        }
+        @media (max-width: 600px) {
+            .time {
+                font-size: 1.5em;
+            }
+            .buttons button {
+                width: 50px;
+                height: 50px;
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="time" id="display">00:00:00.000</div>
+        <div class="buttons">
+            <button class="start" onclick="startTimer()">Start</button>
+            <button class="record" onclick="recordTime()">Rec</button>
+            <button class="stop" onclick="stopTimer()">Stop</button>
+            <button class="reset" onclick="resetTimer()">reset</button>
+        </div>
+    </div>
+    <div class="results-container">
+        <div class="results" id="results"><h3>Recorded Times:</h3></div>
+    </div>
+    <script>
+        let timer;
+        let hours = 0, minutes = 0, seconds = 0, milliseconds = 0;
+        let running = false;
+        let records = [];
+        
+        function updateDisplay() {
+            document.getElementById("display").innerText = 
+                (hours < 10 ? "0" + hours : hours) + ":" +
+                (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds) + "." +
+                (milliseconds < 100 ? (milliseconds < 10 ? "00" + milliseconds : "0" + milliseconds) : milliseconds);
+        }
+
+        function startTimer() {
+            if (!running) {
+                running = true;
+                timer = setInterval(() => {
+                    milliseconds += 10;
+                    if (milliseconds >= 1000) {
+                        milliseconds = 0;
+                        seconds++;
+                    }
+                    if (seconds === 60) {
+                        seconds = 0;
+                        minutes++;
+                    }
+                    if (minutes === 60) {
+                        minutes = 0;
+                        hours++;
+                    }
+                    updateDisplay();
+                }, 10);
+            }
+        }
+
+        function stopTimer() {
+            if (running) {
+                running = false;
+                clearInterval(timer);
+            }
+        }
+
+        function recordTime() {
+            if (records.length < 4) {
+                let record = document.getElementById("display").innerText;
+                records.push(record);
+                updateRecords();
+            }
+        }
+
+        function updateRecords() {
+            let resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "<h3>Recorded Times:</h3>" + records.map((time, index) => `<p>${index + 1}. ${time}</p>`).join('');
+        }
+
+        function resetTimer() {
+            running = false;
+            clearInterval(timer);
+            hours = 0;
+            minutes = 0;
+            seconds = 0;
+            milliseconds = 0;
+            records = [];
+            updateDisplay();
+            document.getElementById("results").innerHTML = "<h3>Recorded Times:</h3>";
+        }
+    </script>
+</body>
+</html>
